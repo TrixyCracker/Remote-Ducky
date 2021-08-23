@@ -1,4 +1,4 @@
-#include "Keyboard_IT.h"
+#include "libraries/Keyboard_IT/Keyboard_IT.h"
 #include <Wire.h>
 
 bool is_string_received = false;

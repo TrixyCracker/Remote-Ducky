@@ -13,19 +13,22 @@
             <br>
             <textarea class="min_textarea" id="script_area" cols="40" rows="15"></textarea>
             <br>
-            <p class="min_text" id="char_counter">SOS</p>
-            <p class="min_text" id="line_counter">SOS</p>
+            <p class="min_text" style="font-size: 12pt;" id="char_counter">SOS</p>
+            <p class="min_text" style="font-size: 12pt;" id="line_counter">SOS</p>
+            <br><br>
             <a class="min_button" onclick="send_script()">SEND</a>
+            <input type="checkbox" id="caps_check">
+            <label for="caps_check">CAPSLOCK activated?</label>
         </div>
         <div class="min_div" style="width: 50%;">
             <p class="min_text">LEGENDA</p>
-            <span>
+            <br><br>
             <p class="min_text left">STRING <string>: write phrase</p>
-            <span>
+            <br><br>
             <p class="min_text left">DELAY <time>: delay a time before go to next script line</p>
-            <span>
+            <br><br>
             <p class="min_text left">DEFAULT_DELAY <value> or DEFAULTDELAY <value>: set a value of default delay, if value is not set, the controller wait default delay setted in the past</p>
-            <span>
+            <br><br>
         </div>
         </center>
     </body>

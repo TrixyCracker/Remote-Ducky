@@ -1,0 +1,3 @@
+[submodule "Arduino/libraries/Keyboard_IT"]
+	path = Arduino/libraries/Keyboard_IT
+	url = https://github.com/TrixyCracker/Keyboard_IT/

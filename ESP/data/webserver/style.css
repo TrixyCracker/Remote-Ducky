@@ -38,6 +38,7 @@ a.min_button:hover
 
 p.min_text 
 {
+    display: inline-block;
     font-size: 25pt;
     margin: 5px;
     text-transform: uppercase;
