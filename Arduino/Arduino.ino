@@ -1,4 +1,4 @@
-#include "libraries/Keyboard_IT/Keyboard_IT.h"
+#include "Keyboard_IT.h"
 #include <Wire.h>
 
 bool is_string_received = false;
@@ -26,7 +26,7 @@ void loop() {
   {
     Serial.println(bufferr.c_str());
 
-    first_newline = bufferr.indexOf("\\n");
+    first_newline = bufferr.indexOf("@@");
     while(true) {
 
       partial_buffer = bufferr.substring(0, first_newline);
@@ -34,7 +34,7 @@ void loop() {
 
       bufferr = bufferr.substring(first_newline + 2);
 
-      first_newline = bufferr.indexOf("\\n");
+      first_newline = bufferr.indexOf("@@");
 
       if (first_newline == -1)
       {

@@ -6,6 +6,11 @@ body
     font-family: 'Calibri';
 }
 
+div
+{
+    margin: 10px;
+}
+
 textarea.min_textarea
 {
     background-color: #323232;
@@ -27,6 +32,11 @@ a.min_button
     margin: 5px;
     padding: 10px 30px;
     text-decoration: none;
+}
+
+a.min_button.inline
+{
+    display: inline;
 }
 
 a.min_button:hover

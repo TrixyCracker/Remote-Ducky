@@ -19,8 +19,17 @@
             <a class="min_button" onclick="send_script()">SEND</a>
             <input type="checkbox" id="caps_check">
             <label for="caps_check">CAPSLOCK activated?</label>
+            <br><br>
+            <a class="min_button" onclick="save_script()">SAVE</a>
+            <a class="min_button" onclick="download_script()">DOWNLOAD</a>
         </div>
         <div class="min_div" style="width: 50%;">
+            <p class="min_text">SCRIPT LIST</p>
+            <br><br>
+            <div id="script_list"></div>
+            <a class="min_button" onclick="setup_scriptlist()">REFRESH</a>
+        </div>
+        <!--<div class="min_div" style="width: 50%;">
             <p class="min_text">LEGENDA</p>
             <br><br>
             <p class="min_text left">STRING <string>: write phrase</p>
@@ -30,7 +39,7 @@
             <p class="min_text left">DEFAULT_DELAY <value> or DEFAULTDELAY <value>: set a value of default delay, if value is not set, the controller wait default delay setted in the past</p>
             <br><br>
         </div>
-        </center>
+        </center>-->
     </body>
     <script>init()</script>
 </html>

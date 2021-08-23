@@ -2,8 +2,6 @@
 #include <ESPAsyncWebServer.h>
 #include <Wire.h>
 
-const char* PARAM_INPUT_1 = "script";
-
 AsyncWebServer server(80);
 
 void setup() {
@@ -26,44 +24,90 @@ void setup() {
     request->send(SPIFFS, "/webserver/script.js", "text/javascript");
   });
 
-  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    String str;
+  server.on("/scriptlist", HTTP_GET, [](AsyncWebServerRequest *request){
+    String script_string = "";
     
-    if (request->hasParam(PARAM_INPUT_1)) {
+    Dir dir = SPIFFS.openDir("/scripts/");
+    while(dir.next())
+    {
+      script_string += dir.fileName().substring(9);
+      script_string += "-";
+    }
 
-      str = request->getParam(PARAM_INPUT_1)->value();
+    script_string[script_string.length() - 1] = '\0';
+    
+    request->send(200, "text/plain", script_string.c_str());
+  });
 
-      //if (str.substring(str.length() - 5) != "\\nEND")
-      {
-        //str += "\\nEND";
-      }
+  server.on("/scriptread", HTTP_GET, [](AsyncWebServerRequest *request){
+
+    if (request->hasParam("name"))
+    {
+      String script_name = request->getParam("name")->value();
+
+      String path = "/scripts/" + script_name;
+
+      String script = "";
+
+      File script_file = SPIFFS.open(path.c_str(), "r");
+
+      while(script_file.available()) 
+        script += (char)script_file.read();
+
+      script_file.close();
+
+      request->send(200, "text/plain", script.c_str());
+    }
+    
+  });
+
+  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+    
+    if (request->hasParam("run")) {
+
+      String script = request->getParam("run")->value();
 
       request->send(200, "text/plain", "");
 
       Serial.print("SCRIPT : ");
-      Serial.println(str.c_str());
+      Serial.println(script.c_str());
 
       Serial.println("BEGIN TRANSMISSION");
 
       while(true) {
-        if (32 >= str.length())
+        if (32 >= script.length())
         {
-          if (str.length() == 32)
-            i2c_send_string(str.c_str(), str.length());
+          if (script.length() == 32)
+            i2c_send_string(script.c_str(), script.length());
           else
-            i2c_send_string(str.c_str(), str.length() + 1);
+            i2c_send_string(script.c_str(), script.length() + 1);
           break;
         }
         else
         {
-          i2c_send_string(str.substring(0, 32).c_str(), 32);
-          str = str.substring(32);
+          i2c_send_string(script.substring(0, 32).c_str(), 32);
+          script = script.substring(32);
         }
       }
 
       Serial.println("FINISHED TRANSMISSION");
       
     }
+    else if (request->hasParam("name") && request->hasParam("script"))
+    {
+
+      String script_name = request->getParam("name")->value();
+      String script_code = request->getParam("script")->value();
+
+      String path = "/scripts/" + script_name;
+
+      request->send(200, "text/plain", "");
+
+      File script_file = SPIFFS.open(path.c_str(), "w");
+      script_file.print(script_code.c_str());
+      script_file.close();
+    }
+    
   });
 
   server.begin();
