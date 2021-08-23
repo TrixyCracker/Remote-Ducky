@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <link rel="stylesheet" href="./style.css">
+        <script src="./script.js"></script>
+    </head>
+
+    <body>
+        <center>
+        <div class="min_div" style="width: 50%;">
+            <p class="min_text">Script:</p>
+            <br>
+            <textarea class="min_textarea" id="script_area" cols="40" rows="15"></textarea>
+            <br>
+            <p class="min_text" id="char_counter">SOS</p>
+            <p class="min_text" id="line_counter">SOS</p>
+            <a class="min_button" onclick="send_script()">SEND</a>
+        </div>
+        <div class="min_div" style="width: 50%;">
+            <p class="min_text">LEGENDA</p>
+            <span>
+            <p class="min_text left">STRING <string>: write phrase</p>
+            <span>
+            <p class="min_text left">DELAY <time>: delay a time before go to next script line</p>
+            <span>
+            <p class="min_text left">DEFAULT_DELAY <value> or DEFAULTDELAY <value>: set a value of default delay, if value is not set, the controller wait default delay setted in the past</p>
+            <span>
+        </div>
+        </center>
+    </body>
+    <script>init()</script>
+</html>

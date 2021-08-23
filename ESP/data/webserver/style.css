@@ -1,0 +1,65 @@
+
+body
+{
+    background-color: #323232;
+    color: whitesmoke;
+    font-family: 'Calibri';
+}
+
+textarea.min_textarea
+{
+    background-color: #323232;
+    color: whitesmoke;
+    display: inline-block;
+    font-family: 'Calibri';
+    font-size: large;
+    margin: 5px;
+    resize: none;
+    width: 90%;
+}
+
+a.min_button
+{
+    border: 2px solid whitesmoke;
+    border-radius: 15px;
+    cursor: default;
+    display: inline-block;
+    margin: 5px;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+
+a.min_button:hover
+{
+    animation: button1 2s infinite;
+    background-color: skyblue;
+    cursor: pointer;
+}
+
+p.min_text 
+{
+    font-size: 25pt;
+    margin: 5px;
+    text-transform: uppercase;
+}
+p.min_text.left
+{
+    float:left;
+}
+
+div.min_div
+{
+    border: 2px whitesmoke solid;
+    color: whitesmoke;
+    overflow: hidden;
+    padding: 20px;
+}
+
+@keyframes button1 {
+    0% {background-color: #323232;}
+    50% {background-color: whitesmoke;}
+    100% {background-color: #323232;}
+    0% {color: whitesmoke;}
+    50% {color: #323232;}
+    100% {color: whitesmoke;}
+}
