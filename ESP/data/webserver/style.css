@@ -9,6 +9,7 @@ body
 div
 {
     margin: 10px;
+    padding: 20px;
 }
 
 textarea.min_textarea
@@ -36,7 +37,14 @@ a.min_button
 
 a.min_button.inline
 {
-    display: inline;
+    border-left: 2px solid whitesmoke;
+    border-right: 2px solid whitesmoke;
+    border-top: 0;
+    border-bottom: 0;
+    border-radius: 0px;
+    display: inline-block;
+    width: 90%;
+    margin: 0%;
 }
 
 a.min_button:hover
@@ -63,7 +71,6 @@ div.min_div
     border: 2px whitesmoke solid;
     color: whitesmoke;
     overflow: hidden;
-    padding: 20px;
 }
 
 @keyframes button1 {

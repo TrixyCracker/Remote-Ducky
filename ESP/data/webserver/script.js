@@ -11,15 +11,16 @@ function setup_scriptlist() {
         if (this.readyState == 4 && this.status == 200) {
             let response = this.responseText;
 
+            let script_list = document.getElementById("script_list");
+
             if (response == "")
             {
-                script_list.innerHTML = "None";
+                script_list.innerHTML = "<p class=\"min_text\">None</p>";
                 return;
             }
 
             let response_splitted = response.split("-");
 
-            let script_list = document.getElementById("script_list");
             script_list.innerHTML = "";
 
             response_splitted.forEach(scriptname => {
@@ -35,7 +36,7 @@ function setup_scriptlist() {
             });
         }
     };
-    xhttp.open("GET", "/scriptlist", true);
+    xhttp.open("GET", "/read?scriptlist", true);
     xhttp.send();
 }
 
@@ -87,7 +88,7 @@ function send_script() {
     }
 
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update?run=" + script, true);
+    xhr.open("GET", "/write?run=" + script, true);
     xhr.send();
 }
 
@@ -106,7 +107,7 @@ function save_script() {
     let script_name = prompt("Inserisci il nome dello script");
 
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "/update?name=" + script_name + "&script=" + script_code, true);
+    xhr.open("GET", "/write?name=" + script_name + "&script=" + script_code, true);
     xhr.send();
 }
 
@@ -120,9 +121,11 @@ function read_script(name) {
 
             let script_area = document.getElementById("script_area");
             script_area.value = response;
+
+            countCharacters();
         }
     };
-    xhttp.open("GET", "/scriptread?name=" + name, true);
+    xhttp.open("GET", "/read?name=" + name, true);
     xhttp.send();
 }
 

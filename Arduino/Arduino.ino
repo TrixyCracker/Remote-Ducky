@@ -1,4 +1,4 @@
-#include "Keyboard_IT.h"
+#include "./libraries/Keyboard_IT/Keyboard_IT.h"
 #include <Wire.h>
 
 bool is_string_received = false;
@@ -21,33 +21,7 @@ String partial_buffer = "";
 int first_newline;
 void loop() {
   // put your main code here, to run repeatedly:
-
-  if (is_string_received)
-  {
-    Serial.println(bufferr.c_str());
-
-    first_newline = bufferr.indexOf("@@");
-    while(true) {
-
-      partial_buffer = bufferr.substring(0, first_newline);
-      parser(partial_buffer);
-
-      bufferr = bufferr.substring(first_newline + 2);
-
-      first_newline = bufferr.indexOf("@@");
-
-      if (first_newline == -1)
-      {
-        parser(bufferr);
-        break;
-      }
-      
-    }
-
-    is_string_received = false;
-    bufferr = "";
-  }
- 
+ asm("nop");
 }
 
 char c;
@@ -59,8 +33,7 @@ void read_buffer32()
     c = (char)Wire.read();
     if (c == '\0')
     {
-      Serial.println("STRING OK");
-      is_string_received = true;
+      start_script();
       break;
     }
     bufferr += c;
@@ -68,6 +41,32 @@ void read_buffer32()
     
 }
 
+
+void start_script()
+{
+  Serial.println(bufferr.c_str());
+
+  bufferr = "";
+
+  first_newline = bufferr.indexOf("@@");
+  while(true) {
+
+    partial_buffer = bufferr.substring(0, first_newline);
+    parser(partial_buffer);
+
+    bufferr = bufferr.substring(first_newline + 2);
+
+    first_newline = bufferr.indexOf("@@");
+
+    if (first_newline == -1)
+    {
+      parser(bufferr);
+      break;
+    }
+
+  }
+    
+}
 
 String parser_buffer;
 void parser(String str)

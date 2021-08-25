@@ -24,22 +24,7 @@ void setup() {
     request->send(SPIFFS, "/webserver/script.js", "text/javascript");
   });
 
-  server.on("/scriptlist", HTTP_GET, [](AsyncWebServerRequest *request){
-    String script_string = "";
-    
-    Dir dir = SPIFFS.openDir("/scripts/");
-    while(dir.next())
-    {
-      script_string += dir.fileName().substring(9);
-      script_string += "-";
-    }
-
-    script_string[script_string.length() - 1] = '\0';
-    
-    request->send(200, "text/plain", script_string.c_str());
-  });
-
-  server.on("/scriptread", HTTP_GET, [](AsyncWebServerRequest *request){
+  server.on("/read", HTTP_GET, [](AsyncWebServerRequest *request){
 
     if (request->hasParam("name"))
     {
@@ -58,10 +43,25 @@ void setup() {
 
       request->send(200, "text/plain", script.c_str());
     }
+    else if (request->hasParam("scriptlist"))
+    {
+      String script_string = "";
+    
+      Dir dir = SPIFFS.openDir("/scripts/");
+      while(dir.next())
+      {
+        script_string += dir.fileName().substring(9);
+        script_string += "-";
+      }
+
+      script_string[script_string.length() - 1] = '\0';
+    
+      request->send(200, "text/plain", script_string.c_str());
+    }
     
   });
 
-  server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
+  server.on("/write", HTTP_GET, [] (AsyncWebServerRequest *request) {
     
     if (request->hasParam("run")) {
 
