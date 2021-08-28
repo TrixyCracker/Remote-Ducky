@@ -1,11 +1,20 @@
 #include "./libraries/Keyboard_IT/Keyboard_IT.h"
 #include <Wire.h>
 
-bool is_string_received = false;
+volatile bool new_script_ready = false;
 
-void setup() {
+String i2c_buffer = "";
+String script_buffer = "";
+
+int default_delay = 0;
+
+void setup()
+{
   // put your setup code here, to run once:
+
+#ifdef DEBUG
   Serial.begin(115200);
+#endif
 
   Wire.begin(0x66); // join as slave with 0x66 address
   Wire.onReceive(read_buffer32);
@@ -14,58 +23,92 @@ void setup() {
   delay(1000);
 }
 
-int default_delay;
-
-String bufferr = "";
-String partial_buffer = "";
-int first_newline;
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
- asm("nop");
+
+  if (new_script_ready)
+  {
+    new_script_ready = false;
+
+    script_buffer = i2c_buffer;
+    i2c_buffer = "";
+    
+    start_script();
+  }
+
+  delay(500);
 }
 
-char c;
 void read_buffer32()
-{
+{ 
+  static char c;
 
   for (int i = 0; i < 32; ++i)
   {
     c = (char)Wire.read();
+    
     if (c == '\0')
     {
-      start_script();
+      new_script_ready = true;
       break;
     }
-    bufferr += c;
+    i2c_buffer += c;
   }
-    
-}
 
+}
 
 void start_script()
 {
-  Serial.println(bufferr.c_str());
+  static String line_buffer;
+  line_buffer = "";
 
-  bufferr = "";
+  static bool replay;
+  replay = false;
 
-  first_newline = bufferr.indexOf("@@");
-  while(true) {
+  static int min_index;
+  static int max_index;
 
-    partial_buffer = bufferr.substring(0, first_newline);
-    parser(partial_buffer);
+#ifdef DEBUG
+  Serial.print(F("BUFFER : "));
+  Serial.println(script_buffer.c_str());
+#endif
 
-    bufferr = bufferr.substring(first_newline + 2);
+  max_index = script_buffer.indexOf("@@");
 
-    first_newline = bufferr.indexOf("@@");
+  if (script_buffer.substring(0, max_index) == "REPLAY")
+  {
+    script_buffer = script_buffer.substring(max_index + 2);
+    replay = true;
+  }
 
-    if (first_newline == -1)
+  do
+  {
+    min_index = 0;
+    max_index = 0;
+
+    while (true)
     {
-      parser(bufferr);
-      break;
+      max_index = script_buffer.indexOf("@@", min_index);
+
+      if (max_index == -1) // last line
+      {
+        line_buffer = script_buffer.substring(min_index);
+        parser(line_buffer);
+        
+        break;
+      }
+      else
+      {
+        line_buffer = script_buffer.substring(min_index, max_index);
+        parser(line_buffer);
+      }
+
+      min_index = max_index + 2; // +2 for let out '@@'
     }
 
-  }
-    
+  } while (replay && !new_script_ready);
+  
 }
 
 String parser_buffer;
@@ -73,8 +116,8 @@ void parser(String str)
 {
   static int first_space;
   first_space = str.indexOf(' ');
-  
-  if (first_space == -1) 
+
+  if (first_space == -1)
   {
 
     if (str == "ENTER")
@@ -86,10 +129,10 @@ void parser(String str)
     {
       delay(default_delay);
     }
-    else return;
-    
+    else
+      return;
   }
-  
+
   if (str.substring(0, first_space) == "STRING")
   {
     for (int i = first_space + 1; i < str.length(); ++i)
@@ -98,7 +141,7 @@ void parser(String str)
   else if (str.substring(0, first_space) == "DELAY")
   {
     static int delay_time;
-    delay_time = str.substring(first_space + 1).toInt();  
+    delay_time = str.substring(first_space + 1).toInt();
     delay(delay_time);
   }
   else if (str.substring(0, first_space) == "DEFAULT_DELAY" || str.substring(0, first_space) == "DEFAULTDELAY")
@@ -127,5 +170,4 @@ void parser(String str)
       Keyboard.releaseAll();
     }
   }
-
 }
