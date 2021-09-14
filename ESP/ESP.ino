@@ -4,6 +4,26 @@
 
 AsyncWebServer server(80);
 
+IPAddress local_ip(192,168,1,128);
+IPAddress gateway(192,168,1,1);
+IPAddress subnet(255,255,255,0);
+
+typedef struct
+{
+  char ssid[32];
+  char password[32];
+  uint8_t channel;
+  uint8_t hidden;
+  uint8_t max_connection;
+} wifi_info;
+
+wifi_info settings =
+{
+  .channel=1,
+  .hidden=0,
+  .max_connection=2
+};
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -12,7 +32,15 @@ void setup() {
 
   SPIFFS.begin();
 
-  WiFi.softAP("ssid", "password");
+  setup_settings();
+  Serial.println(settings.ssid);
+  Serial.println(strlen(settings.ssid));
+  Serial.println(settings.password);
+  Serial.println(strlen(settings.password));
+  Serial.println(settings.hidden);
+
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+  WiFi.softAP(settings.ssid, settings.password, settings.channel, settings.hidden, settings.max_connection);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/webserver/index.html", "text/html");
@@ -122,6 +150,40 @@ void i2c_send_string(const char * str, int sizee)
     Wire.write((char)str[i]);
   }
   Wire.endTransmission();
+}
+
+void setup_settings()
+{
+  File settings_file = SPIFFS.open("/settings.st", "r");
+
+  String file_buffer = "";
+
+  while(settings_file.available())
+  {
+    file_buffer += (char)settings_file.read();
+  }
+
+  settings_file.close();
+
+  int min_index;
+  int max_index;
+  String str;
+
+  max_index = file_buffer.indexOf('\n');
+  str = file_buffer.substring(0, max_index);
+  strcpy(settings.ssid, str.c_str());
+
+  min_index = max_index + 1;
+
+  max_index = file_buffer.indexOf('\n', min_index);
+  str = file_buffer.substring(min_index, max_index);
+  strcpy(settings.password, str.c_str());
+
+  min_index = max_index + 1;
+
+  max_index = file_buffer.indexOf('\n', min_index);
+  str = file_buffer.substring(min_index, max_index);
+  settings.hidden = str.toInt();
 }
 
 void loop() {

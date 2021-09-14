@@ -9,7 +9,43 @@ body
 div
 {
     margin: 10px;
-    padding: 20px;
+}
+
+div.min_navbar
+{
+    border: 2px solid whitesmoke;
+    border-radius: 10px;
+
+    display: inline-block;
+
+    overflow: hidden;
+
+    width: 90%;
+}
+
+a.min_navbar_button
+{
+    border-right: 2px solid whitesmoke;
+    color: whitesmoke;
+    cursor: default;
+    overflow: hidden;
+    float: left;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+
+a.min_navbar_button.right
+{
+    border-right: 0;
+    border-left: 2px solid whitesmoke;
+    float: right;
+}
+
+a.min_navbar_button:hover
+{
+    animation: button1 2s infinite;
+    background-color: skyblue;
+    cursor: pointer;
 }
 
 textarea.min_textarea
