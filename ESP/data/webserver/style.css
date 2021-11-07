@@ -1,7 +1,7 @@
 
 body
 {
-    background-color: #323232;
+    background-color: #1e1415;
     color: whitesmoke;
     font-family: 'Calibri';
 }
@@ -71,22 +71,49 @@ a.min_button
     text-decoration: none;
 }
 
-a.min_button.inline
-{
-    border-left: 2px solid whitesmoke;
-    border-right: 2px solid whitesmoke;
-    border-top: 0;
-    border-bottom: 0;
-    border-radius: 0px;
-    display: inline-block;
-    width: 90%;
-    margin: 0%;
-}
-
 a.min_button:hover
 {
     animation: button1 2s infinite;
     background-color: skyblue;
+    cursor: pointer;
+}
+
+a.min_button_left
+{
+    border: 2px solid whitesmoke;
+    border-right: 0px;
+    border-radius: 15px 0 0 15px;
+    background-color: red;
+    cursor: default;
+    display: inline-block;
+    margin: 5px;
+    margin-right: 0px;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+
+a.min_button_left:hover
+{
+    animation: ani_2 2s infinite;
+    cursor: pointer;
+}
+
+a.min_button_right
+{
+    border: 2px solid whitesmoke;
+    border-radius: 0 15px 15px 0;
+    background-color: green;
+    cursor: default;
+    display: inline-block;
+    margin: 5px;
+    margin-left: 0px;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+
+a.min_button_right:hover
+{
+    animation: ani_2 2s infinite;
     cursor: pointer;
 }
 
@@ -116,4 +143,8 @@ div.min_div
     0% {color: whitesmoke;}
     50% {color: #323232;}
     100% {color: whitesmoke;}
+}
+
+@keyframes ani_2 {
+    50% {background-color: black;}
 }

@@ -39,8 +39,9 @@ void setup() {
   Serial.println(strlen(settings.password));
   Serial.println(settings.hidden);
 
-  WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP(settings.ssid, settings.password, settings.channel, settings.hidden, settings.max_connection);
+  //WiFi.softAPConfig(local_ip, gateway, subnet);
+  WiFi.softAP("ssid", "password");
+  //WiFi.softAP(settings.ssid, settings.password, settings.channel, settings.hidden, settings.max_connection);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/webserver/index.html", "text/html");
@@ -50,6 +51,18 @@ void setup() {
   });
   server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/webserver/script.js", "text/javascript");
+  });
+
+  server.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
+
+    if (request->hasParam("name"))
+    {
+      String filepath = "/scripts/" + request->getParam("name")->value();
+      
+      SPIFFS.remove(filepath.c_str());
+
+      request->send(200, "text/plain", "");
+    }
   });
 
   server.on("/read", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -79,6 +92,9 @@ void setup() {
       while(dir.next())
       {
         script_string += dir.fileName().substring(9);
+        /*script_string += " (" ;
+        script_string += dir.fileSize(); 
+        script_string += " bytes)";*/
         script_string += "-";
       }
 
@@ -127,7 +143,7 @@ void setup() {
       String script_name = request->getParam("name")->value();
       String script_code = request->getParam("script")->value();
 
-      String path = "/scripts/" + script_name;
+      String path = "/scripts/" + script_name + ".sc";
 
       request->send(200, "text/plain", "");
 

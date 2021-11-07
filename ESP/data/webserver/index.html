@@ -13,26 +13,31 @@
             <a class="min_navbar_button" href="./settings.html">Settings</a>
             <a class="min_navbar_button right" href="./help.html">HELP & INFO</a>
         </div>
-        <div class="min_div" style="width: 50%;">
+        <div class="min_div">
+
             <p class="min_text">Script:</p>
             <br>
             <textarea class="min_textarea" id="script_area" cols="40" rows="15"></textarea>
             <br>
             <p class="min_text" style="font-size: 12pt;" id="char_counter">SOS</p>
             <p class="min_text" style="font-size: 12pt;" id="line_counter">SOS</p>
+
             <br><br>
+
+            <a class="min_button" onclick="save_script()">SAVE</a>
+            <a class="min_button" onclick="download_script()">DOWNLOAD</a>
             <a class="min_button" onclick="send_script()">SEND</a>
+
+
             <input type="checkbox" id="caps_check">
             <label for="caps_check">CAPSLOCK activated?</label>
             <br><br>
-            <a class="min_button" onclick="save_script()">SAVE</a>
-            <a class="min_button" onclick="download_script()">DOWNLOAD</a>
-        </div>
-        <div class="min_div" style="width: 50%;">
+
             <p class="min_text">SCRIPT LIST</p>
             <br>
             <div id="script_list"></div>
             <a class="min_button" onclick="setup_scriptlist()">REFRESH</a>
+        
         </div>
         <!--<div class="min_div" style="width: 50%;">
             <p class="min_text">LEGENDA</p>

@@ -6,6 +6,7 @@ function init() {
 }
 
 function setup_scriptlist() {
+
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -23,16 +24,33 @@ function setup_scriptlist() {
 
             script_list.innerHTML = "";
 
-            response_splitted.forEach(scriptname => {
-                let a = document.createElement("a");
-                a.setAttribute("class", "min_button inline");
-                a.setAttribute("onClick", "read_script(\"" + scriptname + "\")");
+            response_splitted.forEach(filename => {
 
-                let text = document.createTextNode(scriptname);
+                let div = document.createElement("div");
+                div.setAttribute("class", "min_div");
 
-                a.appendChild(text);
+                let delete_button = document.createElement("a");
+                delete_button.setAttribute("onClick", "delete_script(\"" + filename + "\")");
+                delete_button.setAttribute("class", "min_button_left");
+                delete_button.setAttribute("style", "float: right;");
+                delete_button.innerHTML = "DELETE";
 
-                script_list.appendChild(a);
+                let load_button = document.createElement("a");
+                load_button.setAttribute("onClick", "read_script(\"" + filename + "\")");
+                load_button.setAttribute("class", "min_button_right");
+                load_button.setAttribute("style", "float: right;");
+                load_button.innerHTML = "LOAD";
+
+                let script_name = document.createElement("p");
+                script_name.setAttribute("class", "min_text");
+                script_name.setAttribute("style", "float: left;");
+                script_name.innerHTML = filename.toUpperCase();
+
+                div.appendChild(script_name);
+                div.appendChild(load_button);
+                div.appendChild(delete_button);
+
+                script_list.appendChild(div);
             });
         }
     };
@@ -108,6 +126,12 @@ function save_script() {
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/write?name=" + script_name + "&script=" + script_code, true);
+    xhr.send();
+}
+
+function delete_script(script_name) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/delete?name=" + script_name, true);
     xhr.send();
 }
 
