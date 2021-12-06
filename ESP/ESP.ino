@@ -2,6 +2,11 @@
 #include <ESPAsyncWebServer.h>
 #include <Wire.h>
 
+#define default_ssid "ssidbismillih"
+#define default_password "password123"
+
+#define DEBUG
+
 AsyncWebServer server(80);
 
 IPAddress local_ip(192,168,1,128);
@@ -21,7 +26,7 @@ wifi_info settings =
 {
   .channel=1,
   .hidden=0,
-  .max_connection=2
+  .max_connection=1
 };
 
 void setup() {
@@ -39,9 +44,18 @@ void setup() {
   Serial.println(strlen(settings.password));
   Serial.println(settings.hidden);
 
-  //WiFi.softAPConfig(local_ip, gateway, subnet);
-  WiFi.softAP("ssid", "password");
-  //WiFi.softAP(settings.ssid, settings.password, settings.channel, settings.hidden, settings.max_connection);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+
+  if (strcmp(settings.ssid, "") == 0 || strlen(settings.password) < 8)
+  {
+    WiFi.softAP(default_ssid, default_password);
+  }
+  else
+  {
+    WiFi.softAP(default_ssid, default_password);
+    //WiFi.softAP(settings.ssid, settings.password);
+    //WiFi.softAP(settings.ssid, settings.password, settings.channel, settings.hidden, settings.max_connection);
+  }
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/webserver/index.html", "text/html");
@@ -92,13 +106,12 @@ void setup() {
       while(dir.next())
       {
         script_string += dir.fileName().substring(9);
-        /*script_string += " (" ;
+        script_string += "@";
         script_string += dir.fileSize(); 
-        script_string += " bytes)";*/
         script_string += "-";
       }
 
-      script_string[script_string.length() - 1] = '\0';
+      script_string[script_string.length() - 1] = '\0'; // remove last '-'
     
       request->send(200, "text/plain", script_string.c_str());
     }
@@ -113,10 +126,10 @@ void setup() {
 
       request->send(200, "text/plain", "");
 
-      Serial.print("SCRIPT : ");
+#ifdef DEBUG
+      Serial.print("SENDING SCRIPT : ");
       Serial.println(script.c_str());
-
-      Serial.println("BEGIN TRANSMISSION");
+#endif
 
       while(true) {
         if (32 >= script.length())
@@ -133,8 +146,6 @@ void setup() {
           script = script.substring(32);
         }
       }
-
-      Serial.println("FINISHED TRANSMISSION");
       
     }
     else if (request->hasParam("name") && request->hasParam("script"))
