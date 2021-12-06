@@ -1,5 +1,7 @@
-#include "./libraries/Keyboard_IT/Keyboard_IT.h"
+#include "Keyboard_IT.h"
 #include <Wire.h>
+
+#define DEBUG
 
 volatile bool new_script_ready = false;
 
@@ -7,6 +9,7 @@ String i2c_buffer = "";
 String script_buffer = "";
 
 int default_delay = 0;
+
 
 void setup()
 {
@@ -33,7 +36,12 @@ void loop()
 
     script_buffer = i2c_buffer;
     i2c_buffer = "";
-    
+
+#ifdef DEBUG
+    Serial.print("SCRIPT: ");
+    Serial.println(script_buffer.c_str());
+#endif
+
     start_script();
   }
 
@@ -41,13 +49,13 @@ void loop()
 }
 
 void read_buffer32()
-{ 
+{
   static char c;
 
   for (int i = 0; i < 32; ++i)
   {
     c = (char)Wire.read();
-    
+
     if (c == '\0')
     {
       new_script_ready = true;
@@ -55,119 +63,240 @@ void read_buffer32()
     }
     i2c_buffer += c;
   }
-
 }
 
 void start_script()
 {
-  static String line_buffer;
-  line_buffer = "";
+  static String line_buffer = "";
+  
+  static int min_index = 0;
+  static int max_index = 0;
 
-  static bool replay;
-  replay = false;
+  while (true)
+  {
+    max_index = script_buffer.indexOf("@@", min_index);
 
-  static int min_index;
-  static int max_index;
+    if (max_index == -1)
+    {
+      line_buffer = script_buffer.substring(min_index);
+    }
+    else
+    {
+      line_buffer = script_buffer.substring(min_index, max_index);
+    }
 
 #ifdef DEBUG
-  Serial.print(F("BUFFER : "));
-  Serial.println(script_buffer.c_str());
+    Serial.print("Linea: ");
+    Serial.println(line_buffer.c_str());
 #endif
 
-  max_index = script_buffer.indexOf("@@");
+    parse_key_modifiers_string(line_buffer);
+    parse_command_string(line_buffer);
 
-  if (script_buffer.substring(0, max_index) == "REPLAY")
-  {
-    script_buffer = script_buffer.substring(max_index + 2);
-    replay = true;
+    if (max_index == -1) break;
+
+    min_index = max_index + 2;
   }
 
-  do
-  {
-    min_index = 0;
-    max_index = 0;
-
-    while (true)
-    {
-      max_index = script_buffer.indexOf("@@", min_index);
-
-      if (max_index == -1) // last line
-      {
-        line_buffer = script_buffer.substring(min_index);
-        parser(line_buffer);
-        
-        break;
-      }
-      else
-      {
-        line_buffer = script_buffer.substring(min_index, max_index);
-        parser(line_buffer);
-      }
-
-      min_index = max_index + 2; // +2 for let out '@@'
-    }
-
-  } while (replay && !new_script_ready);
-  
 }
 
-String parser_buffer;
-void parser(String str)
+void parse_command_string(String script_line)
 {
   static int first_space;
-  first_space = str.indexOf(' ');
+  first_space = script_line.indexOf(' ');
 
-  if (first_space == -1)
+  String command = script_line.substring(0, first_space);
+
+  if (first_space > 0) // Check command with args
   {
 
-    if (str == "ENTER")
+    if (command == "STRING")
     {
-      Keyboard.press(KEY_RETURN);
-      Keyboard.release(KEY_RETURN);
+      for (int i = first_space + 1; i < script_line.length(); ++i)
+      {
+        Keyboard.write((char)script_line.c_str()[i]);
+      }
     }
-    else if (str == "DEFAULT_DELAY" || str == "DEFAULTDELAY")
+    else if (command == "DELAY")
+    {
+      static int delay_time;
+      delay_time = script_line.substring(first_space + 1).toInt();
+      delay(delay_time);
+    }
+    else if (command == "DEFAULT_DELAY" || command == "DEFAULTDELAY")
+    {
+      default_delay = script_line.substring(first_space + 1).toInt();
+    }
+
+  }
+  else // Check command without args
+  {
+    if (script_line == "DEFAULT_DELAY" || script_line == "DEFAULTDELAY")
     {
       delay(default_delay);
     }
+  }
+
+}
+
+void parse_key_modifiers_string(String script_line)
+{
+  bool first_cycle_flag = false;
+
+  int min_index = 0;
+  int max_index = 0;
+
+  String command;
+
+  while (true)
+  {
+    max_index = script_line.indexOf(' ', min_index);
+
+    if (max_index == -1)
+    {
+      command = script_line.substring(min_index);
+    }
     else
-      return;
-  }
+    {
+      command = script_line.substring(min_index, max_index);
+    }
 
-  if (str.substring(0, first_space) == "STRING")
-  {
-    for (int i = first_space + 1; i < str.length(); ++i)
-      Keyboard.write((char)str[i]);
-  }
-  else if (str.substring(0, first_space) == "DELAY")
-  {
-    static int delay_time;
-    delay_time = str.substring(first_space + 1).toInt();
-    delay(delay_time);
-  }
-  else if (str.substring(0, first_space) == "DEFAULT_DELAY" || str.substring(0, first_space) == "DEFAULTDELAY")
-  {
-    default_delay = str.substring(first_space + 1).toInt();
-  }
-  else if (str.substring(0, first_space) == "GUI")
-  {
-    parser_buffer = str.substring(first_space + 1);
-
-    if (parser_buffer.length() == 1)
+    if (command == "CTRL")
+    {
+      Keyboard.press(KEY_LEFT_CTRL);
+    }
+    else if (command == "SHIFT")
+    {
+      Keyboard.press(KEY_LEFT_SHIFT);
+    }
+    else if (command == "GUI")
     {
       Keyboard.press(KEY_LEFT_GUI);
-      Keyboard.press((char)str[4]);
-      Keyboard.releaseAll();
     }
-  }
-  else if (str.substring(0, first_space) == "ALT")
-  {
-    parser_buffer = str.substring(first_space + 1);
-
-    if (parser_buffer.length() == 1)
+    else if (command == "ALT")
     {
       Keyboard.press(KEY_LEFT_ALT);
-      Keyboard.press((char)str[4]);
-      Keyboard.releaseAll();
     }
+    else if (command == "UPARROW")
+    {
+      Keyboard.press(KEY_UP_ARROW);
+    }
+    else if (command == "DOWNARROW")
+    {
+      Keyboard.press(KEY_DOWN_ARROW);
+    }
+    else if (command == "LEFTARROW")
+    {
+      Keyboard.press(KEY_LEFT_ARROW);
+    }
+    else if (command == "RIGHTARROW")
+    {
+      Keyboard.press(KEY_RIGHT_ARROW);
+    }
+    else if (command == "BACKSPACE")
+    {
+      Keyboard.press(KEY_BACKSPACE);
+    }
+    else if (command == "TAB")
+    {
+      Keyboard.press(KEY_TAB);
+    }
+    else if (command == "ENTER" || command == "RETURN")
+    {
+      Keyboard.press(KEY_RETURN);
+    }
+    else if (command == "ESC")
+    {
+      Keyboard.press(KEY_ESC);
+    }
+    else if (command == "INSERT")
+    {
+      Keyboard.press(KEY_INSERT);
+    }
+    else if (command == "DELETE" || command == "CANC")
+    {
+      Keyboard.press(KEY_DELETE);
+    }
+    else if (command == "PAGEUP")
+    {
+      Keyboard.press(KEY_PAGE_UP);
+    }
+    else if (command == "PAGEDOWN")
+    {
+      Keyboard.press(KEY_PAGE_DOWN);
+    }
+    else if (command == "HOME")
+    {
+      Keyboard.press(KEY_HOME);
+    }
+    else if (command == "END")
+    {
+      Keyboard.press(KEY_END);
+    }
+    else if (command == "F1")
+    {
+      Keyboard.press(KEY_F1);
+    }
+    else if (command == "F2")
+    {
+      Keyboard.press(KEY_F2);
+    }
+    else if (command == "F3")
+    {
+      Keyboard.press(KEY_F3);
+    }
+    else if (command == "F4")
+    {
+      Keyboard.press(KEY_F4);
+    }
+    else if (command == "F5")
+    {
+      Keyboard.press(KEY_F5);
+    }
+    else if (command == "F6")
+    {
+      Keyboard.press(KEY_F6);
+    }
+    else if (command == "F7")
+    {
+      Keyboard.press(KEY_F7);
+    }
+    else if (command == "F8")
+    {
+      Keyboard.press(KEY_F8);
+    }
+    else if (command == "F9")
+    {
+      Keyboard.press(KEY_F9);
+    }
+    else if (command == "F10")
+    {
+      Keyboard.press(KEY_F10);
+    }
+    else if (command == "F11")
+    {
+      Keyboard.press(KEY_F11);
+    }
+    else if (command == "F12")
+    {
+      Keyboard.press(KEY_F12);
+    }
+    else if (first_cycle_flag && command.length() == 1)
+    {
+      Keyboard.press(script_line[min_index]);
+    }
+
+    if (max_index == -1)
+    {
+      Keyboard.releaseAll();
+      delay(10);
+      break;
+    }
+
+    first_cycle_flag = true;
+
+    min_index = max_index + 1;
+
+    delay(10);
   }
 }

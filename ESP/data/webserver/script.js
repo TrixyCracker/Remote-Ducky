@@ -7,6 +7,36 @@ function init() {
 
 function setup_scriptlist() {
 
+
+    f/*or (let i= 0; i < 20; ++i){
+    let div = document.createElement("div");
+    div.setAttribute("class", "min_div");
+
+    let delete_button = document.createElement("a");
+    delete_button.setAttribute("class", "min_button_left");
+    delete_button.setAttribute("style", "float: right;");
+    delete_button.innerHTML = "DELETE";
+
+    let load_button = document.createElement("a");
+    load_button.setAttribute("class", "min_button_right");
+    load_button.setAttribute("style", "float: right;");
+    load_button.innerHTML = "LOAD";
+
+    let script_name = document.createElement("p");
+    script_name.setAttribute("class", "min_text");
+    script_name.setAttribute("style", "float: left;");
+    script_name.innerHTML = "sasadsfbefuiewbi";
+
+    div.appendChild(script_name);
+    div.appendChild(load_button);
+    div.appendChild(delete_button);
+
+    script_list.appendChild(div);
+    }
+
+    return;*/
+
+
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
@@ -24,19 +54,21 @@ function setup_scriptlist() {
 
             script_list.innerHTML = "";
 
-            response_splitted.forEach(filename => {
+            let splitted_fileinfo = [];
+            response_splitted.forEach(fileinfo => {
+                splitted_fileinfo = fileinfo.split("@"); // [0] : filename, [1] : size
 
                 let div = document.createElement("div");
                 div.setAttribute("class", "min_div");
 
                 let delete_button = document.createElement("a");
-                delete_button.setAttribute("onClick", "delete_script(\"" + filename + "\")");
+                delete_button.setAttribute("onClick", "delete_script(\"" + splitted_fileinfo[0] + "\")");
                 delete_button.setAttribute("class", "min_button_left");
                 delete_button.setAttribute("style", "float: right;");
                 delete_button.innerHTML = "DELETE";
 
                 let load_button = document.createElement("a");
-                load_button.setAttribute("onClick", "read_script(\"" + filename + "\")");
+                load_button.setAttribute("onClick", "read_script(\"" + splitted_fileinfo[0] + "\")");
                 load_button.setAttribute("class", "min_button_right");
                 load_button.setAttribute("style", "float: right;");
                 load_button.innerHTML = "LOAD";
@@ -44,7 +76,7 @@ function setup_scriptlist() {
                 let script_name = document.createElement("p");
                 script_name.setAttribute("class", "min_text");
                 script_name.setAttribute("style", "float: left;");
-                script_name.innerHTML = filename.toUpperCase();
+                script_name.innerHTML = splitted_fileinfo[0].toUpperCase() + " " + splitted_fileinfo[1] + " bytes";
 
                 div.appendChild(script_name);
                 div.appendChild(load_button);
@@ -127,12 +159,16 @@ function save_script() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/write?name=" + script_name + "&script=" + script_code, true);
     xhr.send();
+
+    setup_scriptlist();
 }
 
 function delete_script(script_name) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "/delete?name=" + script_name, true);
     xhr.send();
+
+    setup_scriptlist();
 }
 
 function read_script(name) {
@@ -177,7 +213,7 @@ function download_script() {
     document.body.removeChild(downloader);
 }
 
-function countCharacters(e) {
+function countCharacters() {
     let text = document.getElementById("script_area").value;
 
     let chars_number = text.length;

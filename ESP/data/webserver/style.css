@@ -1,19 +1,19 @@
 
 body
 {
-    background-color: #1e1415;
-    color: whitesmoke;
-    font-family: 'Calibri';
+    background-image: linear-gradient(to right top, #051937, #004d7a, #008793, #00bf72, #a8eb12);
+    font-family: sans-serif;
 }
 
 div
 {
+    color: whitesmoke;
     margin: 10px;
 }
 
 div.min_navbar
 {
-    border: 2px solid whitesmoke;
+    border: 3px solid #004d7a;
     border-radius: 10px;
 
     display: inline-block;
@@ -25,25 +25,34 @@ div.min_navbar
 
 a.min_navbar_button
 {
-    border-right: 2px solid whitesmoke;
-    color: whitesmoke;
     cursor: default;
     overflow: hidden;
     float: left;
     padding: 10px 30px;
     text-decoration: none;
+    text-transform: uppercase;
+}
+
+a.min_navbar_button.left
+{
+    background-color: #051937;
+    border-right: 3px solid #004d7a;
+    color: whitesmoke;
+    float: left;
 }
 
 a.min_navbar_button.right
 {
     border-right: 0;
-    border-left: 2px solid whitesmoke;
+    border-left: 3px solid #004d7a;
+    background-color: #A8EB12;
+    color: black;
     float: right;
 }
 
 a.min_navbar_button:hover
 {
-    animation: button1 2s infinite;
+    animation: ani_2 2s infinite;
     background-color: skyblue;
     cursor: pointer;
 }
@@ -51,29 +60,37 @@ a.min_navbar_button:hover
 textarea.min_textarea
 {
     background-color: #323232;
-    color: whitesmoke;
+    color:whitesmoke;
     display: inline-block;
-    font-family: 'Calibri';
-    font-size: large;
+    font-size: 24PX;
     margin: 5px;
+    overflow: scroll;
     resize: none;
     width: 90%;
+
+    scrollbar-color: #00a4b3;
+
+    border-style: none;
+        border-color: Transparent;
+        outline: none;
 }
 
 a.min_button
 {
-    border: 2px solid whitesmoke;
+    background-color: #00a4b3;
     border-radius: 15px;
     cursor: default;
     display: inline-block;
     margin: 5px;
     padding: 10px 30px;
     text-decoration: none;
+    vertical-align: middle;
+    align-items: center;
 }
 
 a.min_button:hover
 {
-    animation: button1 2s infinite;
+    animation: ani_2 2s infinite;
     background-color: skyblue;
     cursor: pointer;
 }
@@ -83,7 +100,7 @@ a.min_button_left
     border: 2px solid whitesmoke;
     border-right: 0px;
     border-radius: 15px 0 0 15px;
-    background-color: red;
+    background-color: #00a4b3;
     cursor: default;
     display: inline-block;
     margin: 5px;
@@ -102,7 +119,7 @@ a.min_button_right
 {
     border: 2px solid whitesmoke;
     border-radius: 0 15px 15px 0;
-    background-color: green;
+    background-color: #00a4b3;
     cursor: default;
     display: inline-block;
     margin: 5px;
@@ -131,9 +148,12 @@ p.min_text.left
 
 div.min_div
 {
-    border: 2px whitesmoke solid;
-    color: whitesmoke;
+    border: 3px #004d7a solid;
+    box-shadow: 5px 5px 15px 2px #000000;
+
     overflow: hidden;
+
+    width: 80%;
 }
 
 @keyframes button1 {
@@ -147,4 +167,5 @@ div.min_div
 
 @keyframes ani_2 {
     50% {background-color: black;}
+    50% {color: white;}
 }
